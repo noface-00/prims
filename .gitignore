@@ -3,6 +3,20 @@
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+/dataSources/
+/dataSources.local.xml
+/libraries
+/src/config
+/out/production/
+/META-INF
+/dataSources
+/libraries
+/dataSources.local.xml
+/dataSources.xml
+/jpa.xml
+/misc.xml
+/modules.xml
+/vcs.xml
 
 ### Eclipse ###
 .apt_generated
