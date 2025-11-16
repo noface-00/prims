@@ -1,0 +1,42 @@
+/* --- ScrollPane fondo blanco --- */
+.scroll-pane {
+    -fx-background-color: white;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: white;
+}
+
+/* --- ScrollBar vertical --- */
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 4px;   /* grosor del scroll */
+}
+
+/* Ocultar flechas */
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow,
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-shape: "";
+}
+
+/* Pista (track) invisible */
+.scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4px;
+}
+
+/* Thumb (la barra que se mueve) */
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #b8b8b8; /* gris medio */
+    -fx-background-insets: 0;
+    -fx-background-radius: 4px;   /* redondeado */
+}
+
+/* Hover del thumb */
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #9d9d9d;
+}

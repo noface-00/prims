@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="mainConteiner" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="interfaz.controllers.MainController">
+   <bottom>
+      <HBox alignment="CENTER_LEFT" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="btnOptions" mnemonicParsing="false" onAction="#onDisplayOP" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="⟩">
+               <font>
+                  <Font name="Poppins SemiBold" size="16.0" />
+               </font></Button>
+            <Button fx:id="btnOptions1" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="Terminos" visible="false">
+               <font>
+                  <Font name="Poppins SemiBold" size="11.0" />
+               </font>
+            </Button>
+            <Button fx:id="btnOptions2" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="Accesibilidad" visible="false">
+               <font>
+                  <Font name="Poppins SemiBold" size="11.0" />
+               </font>
+            </Button>
+            <Button fx:id="btnOptions3" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="Cerrar Sesion" visible="false">
+               <font>
+                  <Font name="Poppins SemiBold" size="11.0" />
+               </font>
+            </Button>
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" top="10.0" />
+         </padding>
+      </HBox>
+   </bottom>
+   <top>
+      <BorderPane style="-fx-background-color: white;" BorderPane.alignment="CENTER">
+
+         <!-- IZQUIERDA -->
+         <left>
+            <VBox fx:id="blockFiltrar" alignment="CENTER_LEFT" spacing="5.0" BorderPane.alignment="CENTER_LEFT">
+               <children>
+                  <Button fx:id="btnVolver" mnemonicParsing="false" onAction="#onBack" prefHeight="35.0" prefWidth="56.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="⟨" textAlignment="CENTER">
+                     <font>
+                        <Font name="Poppins SemiBold" size="16.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btnFiltrar" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#onShow" prefHeight="27.0" prefWidth="69.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="Filtrar" textAlignment="CENTER">
+                     <font>
+                        <Font name="Poppins SemiBold" size="12.0" />
+                     </font>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="10.0" top="5.0" />
+               </padding>
+            </VBox>
+         </left>
+
+         <!-- CENTRO (BUSCADOR) -->
+         <center>
+            <HBox fx:id="blockBuscar" alignment="TOP_CENTER" spacing="10.0" BorderPane.alignment="CENTER">
+               <children>
+                  <TextField fx:id="txtBuscar" onAction="#onSearch" prefHeight="27.0" prefWidth="250.0" style="-fx-border-color: black; -fx-background-color: white;">
+                     <font>
+                        <Font name="Poppins Light" size="12.0" />
+                     </font>
+                  </TextField>
+                  <Button fx:id="btnSearch" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#onSearch" prefHeight="23.0" prefWidth="44.0" style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                     <graphic>
+                        <ImageView fx:id="imgSearch" fitHeight="25.0" fitWidth="25.0" nodeOrientation="INHERIT" preserveRatio="true">
+                           <image>
+                              <Image url="@recursos/buscar.png" />
+                           </image></ImageView>
+                     </graphic>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets top="10.0" />
+               </padding>
+            </HBox>
+         </center>
+
+         <!-- DERECHA -->
+         <right>
+            <HBox fx:id="blockAnalisis" alignment="TOP_RIGHT" prefWidth="147.0" BorderPane.alignment="TOP_CENTER">
+               <children>
+                  <Label fx:id="lblNumSave" alignment="BOTTOM_CENTER" prefHeight="22.0" prefWidth="27.0" text="100">
+                     <font>
+                        <Font name="Poppins SemiBold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Button fx:id="btnAnalisis" alignment="TOP_CENTER" mnemonicParsing="false" onAction="#onPanelAnalisis" prefHeight="27.0" prefWidth="68.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="Analisis">
+                     <font>
+                        <Font name="Poppins SemiBold" size="12.0" />
+                     </font>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" right="10.0" top="5.0" />
+               </padding>
+            </HBox>
+         </right>
+      </BorderPane>
+   </top>
+
+   <center>
+      <AnchorPane fx:id="contentArea" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: white; -fx-border-color: white;" BorderPane.alignment="CENTER" />
+   </center>
+</BorderPane>

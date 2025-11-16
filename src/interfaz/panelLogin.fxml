@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane fx:id="rootLogin" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="interfaz.controllers.LoginController">
+
+    <!-- CONTENIDO NORMAL -->
+    <VBox fx:id="contentLogin" alignment="CENTER" maxWidth="600" spacing="25">
+
+        <ImageView fx:id="logo" fitHeight="150" fitWidth="200" preserveRatio="true">
+            <image>
+                <Image url="@recursos/PRIMS(logo).png" />
+            </image>
+        </ImageView>
+
+        <Label text="Usuario">
+            <font><Font name="Poppins SemiBold" size="16" /></font>
+        </Label>
+
+        <TextField fx:id="txtUsuario" style="-fx-border-color: black; -fx-background-color: white;">
+            <font><Font name="Poppins Light" size="14" /></font>
+        </TextField>
+
+        <Label text="Contraseña">
+            <font><Font name="Poppins SemiBold" size="16" /></font>
+        </Label>
+
+        <PasswordField fx:id="txtContrasena" style="-fx-border-color: black; -fx-background-color: white;">
+            <font><Font name="Poppins Light" size="14" /></font>
+        </PasswordField>
+
+        <Label fx:id="btnResetPass" onMouseClicked="#onResetPass" text="¿Olvidaste la contraseña?">
+            <font><Font name="Poppins SemiBold" size="11" /></font>
+        </Label>
+
+        <Label fx:id="btnRegister" onMouseClicked="#onRegister" text="¿No tienes una cuenta?">
+            <font><Font name="Poppins SemiBold" size="11" /></font>
+        </Label>
+
+        <Button fx:id="btnIngresar" onAction="#onLogin" prefHeight="39.0" prefWidth="181.0" style="-fx-background-color: black; -fx-text-fill: white;" text="Ingresar">
+            <font><Font name="Poppins SemiBold" size="18" /></font>
+        </Button>
+      <padding>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </padding>
+    </VBox>
+
+    <!-- OVERLAY NEGRO PARA LA ANIMACIÓN -->
+    <Pane fx:id="blackOverlay" style="-fx-background-color: black;" visible="false" />
+
+</StackPane>
