@@ -1,0 +1,283 @@
+package interfaz.controllers;
+
+import entities.Auth;
+import entities.Producto;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import utils.Sesion;
+import utils.TokenManager;
+import utils.cls_browseEBAY;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class GalleryController {
+    private String token = Sesion.getTokenAPI();
+
+    @FXML
+    private BorderPane root;
+    @FXML
+    private GridPane gridPane;
+
+    @FXML private ScrollPane filterPanel;
+    @FXML
+    private HBox paginationBar;
+
+    @FXML
+    private Button btnPrev, btnNext;
+
+
+    // 🔹 Filtros
+    @FXML private TextField txtPrecioMin;
+    @FXML private TextField txtPrecioMax;
+    @FXML private CheckBox cbNuevo;
+    @FXML private CheckBox cbUsado;
+    @FXML private CheckBox cbMenorPrecio;
+    @FXML private CheckBox cbMayorPrecio;
+    @FXML private CheckBox cbRecomendado;
+    @FXML private CheckBox cbMasRecientes;
+
+    private MainController mainController;
+
+    private final List<Producto> allProducts = new ArrayList<>();
+    private int currentPage = 1;
+
+    private static final int COLUMNS = 5;
+    private static final int ROWS = 3;
+    private static final int ITEMS_PER_PAGE = COLUMNS * ROWS;
+
+    private String searchTerm;
+    public Node getRootNode() {
+        return root;
+    }
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
+    }
+
+    public void setSearchTerm(String term) {
+        this.searchTerm = term;
+        loadProducts(term);
+    }
+
+    @FXML
+    public void initialize() {
+        System.out.println("🧠 GalleryController inicializado correctamente");
+    }
+    /** 🔹 Carga productos directamente desde la API eBay */
+    public void loadProducts(String palabra) {
+        try {
+            System.out.println("🌐 Cargando productos desde la API eBay...");
+            cls_browseEBAY apiLoader = new cls_browseEBAY();
+            List<Producto> productos = apiLoader.obtenerProductos(token, palabra);
+
+            if (productos.isEmpty()) {
+                gridPane.getChildren().clear();
+                VBox placeholder = new VBox();
+                Label label = new Label("No se encontraron productos para \"" + palabra + "\"");
+                label.setStyle("-fx-font-size: 18; -fx-text-fill: gray;");
+                placeholder.getChildren().add(label);
+                gridPane.add(placeholder, 0, 0);
+                return;
+            }
+
+            allProducts.clear();
+            allProducts.addAll(productos);
+            currentPage = 1;
+
+            renderPage(); // renderiza en cuadrícula
+            updatePaginationButtons();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /** 🔹 Renderiza los productos en cuadrícula (5x3) */
+    private void renderPage() {
+        gridPane.getChildren().clear();
+
+        int start = (currentPage - 1) * ITEMS_PER_PAGE;
+        int end = Math.min(start + ITEMS_PER_PAGE, allProducts.size());
+
+        int col = 0;
+        int row = 0;
+
+        for (int i = start; i < end; i++) {
+            Producto producto = allProducts.get(i);
+
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/interfaz/product_card.fxml"));
+                VBox card = loader.load();
+
+                ProductCardController controller = loader.getController();
+                controller.setMainController(mainController);
+                controller.setData(producto, producto.getPriceHistory(), producto.getImageUrls()); // sin BD → precio e imagen son null
+
+                card.setPrefWidth(180);
+                card.setPrefHeight(240);
+                GridPane.setMargin(card, new Insets(15));
+
+                // Evento de clic → detalle del producto
+                mainController.setLastGallery(this);
+                card.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> openProductDetail(producto));
+
+
+                gridPane.add(card, col, row);
+                col++;
+                if (col == COLUMNS) {
+                    col = 0;
+                    row++;
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /** 🔹 Botones de paginación dinámicos */
+    private void updatePaginationButtons() {
+        paginationBar.getChildren().removeIf(node -> node != btnPrev && node != btnNext);
+        int totalPages = (int) Math.ceil((double) allProducts.size() / ITEMS_PER_PAGE);
+
+        for (int i = 1; i <= totalPages; i++) {
+            final int pageNumber = i;
+            Button pageBtn = new Button(String.valueOf(pageNumber));
+
+            pageBtn.setStyle(
+                    pageNumber == currentPage
+                            ? "-fx-background-color: black; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 12;"
+                            : "-fx-background-color: transparent; -fx-border-color: black; -fx-border-width: 1; -fx-text-fill: black; -fx-padding: 6 12;"
+            );
+
+            pageBtn.setOnAction(e -> {
+                currentPage = pageNumber;
+                renderPage();
+                updatePaginationButtons();
+            });
+
+            paginationBar.getChildren().add(paginationBar.getChildren().size() - 1, pageBtn);
+        }
+
+        btnPrev.setDisable(currentPage == 1);
+        btnNext.setDisable(currentPage == totalPages);
+    }
+
+    /** 🔹 Abre detalle de producto (más adelante se usará para mostrar información extendida) */
+    @FXML
+    private void openProductDetail(Producto producto) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/interfaz/panel_product.fxml"));
+            Node productPanel = loader.load();
+            ProductController controller = loader.getController();
+
+            // 🔹 Cargar info adicional ANTES de mostrar el panel
+            cls_browseEBAY helper = new cls_browseEBAY();
+            helper.mtd_informationAditional(token, producto);
+
+            // 🔹 Ahora el producto ya tiene descripción, atributos y envío
+            controller.setMainController(mainController);
+            controller.loadProduct(producto);
+
+            mainController.loadCustomPanel(productPanel);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    @FXML
+    private void nextPage() {
+        int totalPages = (int) Math.ceil((double) allProducts.size() / ITEMS_PER_PAGE);
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderPage();
+            updatePaginationButtons();
+        }
+    }
+
+    @FXML
+    private void previousPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            renderPage();
+            updatePaginationButtons();
+        }
+    }
+
+    public void toggleFilters() {
+        boolean isVisible = filterPanel.isVisible();
+        filterPanel.setVisible(!isVisible);
+        filterPanel.setManaged(!isVisible);
+    }
+
+    /** ============================================================
+     FILTRO POR BOTÓN
+     ============================================================ */
+
+    @FXML
+    private void applyFiltersButton() {
+//        System.out.println("🎯 Aplicando filtros manualmente...");
+//
+//        filteredProducts = allProducts.stream()
+//                .filter(this::filterByPrice)
+//                .filter(this::filterByCondition)
+//                .collect(Collectors.toList());
+//
+//        applySorting();
+//
+//        currentPage = 1;
+//        renderPage();
+//        updatePaginationButtons();
+    }
+
+//    private boolean filterByPrice(Producto p) {
+//        try {
+//            double min = txtPrecioMin.getText().isEmpty() ? 0 : Double.parseDouble(txtPrecioMin.getText());
+//            double max = txtPrecioMax.getText().isEmpty() ? Double.MAX_VALUE : Double.parseDouble(txtPrecioMax.getText());
+//
+//            return p.getCurrentPrice() >= min && p.getCurrentPrice() <= max;
+//        } catch (Exception e) {
+//            return true;
+//        }
+//    }
+//
+//    private boolean filterByCondition(Producto p) {
+//        boolean nuevo = cbNuevo.isSelected();
+//        boolean usado = cbUsado.isSelected();
+//
+//        if (!nuevo && !usado) return true; // sin filtro
+//
+//        String cond = p.getCondition().toLowerCase();
+//
+//        if (nuevo && cond.contains("new")) return true;
+//        if (usado && cond.contains("used")) return true;
+//
+//        return false;
+//    }
+//
+//    private void applySorting() {
+//        if (cbMenorPrecio.isSelected())
+//            filteredProducts.sort(Comparator.comparing(Producto::getCurrentPrice));
+//
+//        if (cbMayorPrecio.isSelected())
+//            filteredProducts.sort(Comparator.comparing(Producto::getCurrentPrice).reversed());
+//
+//        if (cbMasRecientes.isSelected())
+//            filteredProducts.sort(Comparator.comparing(Producto::getStartTime).reversed());
+//
+//        if (cbRecomendado.isSelected())
+//            filteredProducts.sort(Comparator.comparing(Producto::getTotalScore).reversed());
+//    }
+}
