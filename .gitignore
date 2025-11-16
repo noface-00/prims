@@ -6,18 +6,17 @@ out/
 /dataSources/
 /dataSources.local.xml
 /libraries
-/src/config
+/src/keys/
 /out/production/
 /META-INF
 /dataSources
-/libraries
+/libraries/
 /dataSources.local.xml
 /dataSources.xml
 /jpa.xml
 /misc.xml
 /modules.xml
 /vcs.xml
-/keys/
 
 ### Eclipse ###
 .apt_generated
