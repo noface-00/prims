@@ -8,7 +8,7 @@
 /dataSources.local.xml
 /libraries
 /src/config
-/out
+/out/production/
 /META-INF
 /dataSources
 /libraries
