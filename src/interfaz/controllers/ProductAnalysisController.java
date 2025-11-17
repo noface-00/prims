@@ -510,14 +510,37 @@ public class ProductAnalysisController {
         CompletableFuture.runAsync(() -> {
             try {
                 ProductAnalysisDAO dao = new ProductAnalysisDAO();
-                dao.create(analisisActual);
-                System.out.println("✅ Análisis guardado en BD para producto: " + productoActual.getItemId());
+
+                ProductAnalysis previo = dao.findLastAnalysisByItem(productoActual.getItemId());
+
+                if (previo != null) {
+                    // actualizar
+                    previo.setAnalysisDate(analisisActual.getAnalysisDate());
+                    previo.setPriceActual(analisisActual.getPriceActual());
+                    previo.setPriceDifference(analisisActual.getPriceDifference());
+                    previo.setMarketAverage(analisisActual.getMarketAverage());
+                    previo.setMarketMin(analisisActual.getMarketMin());
+                    previo.setMarketMax(analisisActual.getMarketMax());
+                    previo.setStdDeviation(analisisActual.getStdDeviation());
+                    previo.setTrustScore(analisisActual.getTrustScore());
+                    previo.setIdSeller(analisisActual.getIdSeller());
+
+                    dao.update(previo);
+
+                    System.out.println("♻️ Análisis actualizado para producto: " + productoActual.getItemId());
+                } else {
+                    // crear nuevo únicamente si no existe
+                    dao.create(analisisActual);
+                    System.out.println("🆕 Nuevo análisis guardado en BD para producto: " + productoActual.getItemId());
+                }
+
             } catch (Exception e) {
                 System.err.println("❌ Error guardando análisis: " + e.getMessage());
                 e.printStackTrace();
             }
         }, executorService);
     }
+
 
     private void cargarEstadisticas() {
         ProductAnalysisDAO dao = new ProductAnalysisDAO();

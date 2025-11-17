@@ -35,9 +35,14 @@ public class ProductAnalysisDAO extends genericDAO<ProductAnalysis>{
         EntityManager em = getEmf().createEntityManager();
         try {
             return em.createQuery(
-                    "SELECT p FROM ProductAnalysis p ORDER BY p.priceDifference DESC",
-                    ProductAnalysis.class
-            ).setMaxResults(limit).getResultList();
+                            "SELECT pa FROM ProductAnalysis pa " +
+                                    "JOIN FETCH pa.item " +               // <-- SOLUCIÓN
+                                    "ORDER BY pa.priceDifference DESC",
+                            ProductAnalysis.class
+                    )
+                    .setMaxResults(limit)
+                    .getResultList();
+
         } finally {
             em.close();
         }
@@ -47,9 +52,14 @@ public class ProductAnalysisDAO extends genericDAO<ProductAnalysis>{
         EntityManager em = getEmf().createEntityManager();
         try {
             return em.createQuery(
-                    "SELECT p FROM ProductAnalysis p ORDER BY p.priceDifference ASC",
-                    ProductAnalysis.class
-            ).setMaxResults(limit).getResultList();
+                            "SELECT pa FROM ProductAnalysis pa " +
+                                    "JOIN FETCH pa.item " +               // <-- SOLUCIÓN
+                                    "ORDER BY pa.priceDifference ASC",
+                            ProductAnalysis.class
+                    )
+                    .setMaxResults(limit)
+                    .getResultList();
+
         } finally {
             em.close();
         }
@@ -69,4 +79,20 @@ public class ProductAnalysisDAO extends genericDAO<ProductAnalysis>{
         }
     }
 
+    public ProductAnalysis findLastAnalysisByItem(String itemId) {
+        EntityManager em = getEmf().createEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT pa FROM ProductAnalysis pa WHERE pa.item.itemId = :id ORDER BY pa.analysisDate DESC",
+                            ProductAnalysis.class
+                    ).setParameter("id", itemId)
+                    .setMaxResults(1)
+                    .getResultStream()
+                    .findFirst()
+                    .orElse(null);
+
+        } finally {
+            em.close();
+        }
+    }
 }
