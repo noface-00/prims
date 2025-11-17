@@ -6,20 +6,19 @@
 /dataSources/
 /dataSources.local.xml
 /libraries
+/.idea/
 /out/production/
 /META-INF/
 META-INF/
 /dataSources
 /libraries/
-/dataSources.local.xml
 /dataSources.xml
 /jpa.xml
 /misc.xml
 /modules.xml
 /vcs.xml
 ../lib/
-lib/
-lib/javafx-sdk-25.0.1/
+/lib/
 
 ### Eclipse ###
 .apt_generated
