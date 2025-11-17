@@ -130,7 +130,7 @@ public class ProductCardController {
         } else{
             btn_guardarInfo.setText("Cancelar");
             ProductAnalysisController productAnalysisController = new ProductAnalysisController();
-            productAnalysisController.onDeletedWish();
+//            productAnalysisController.();
             isPressed = false;
         }
     }

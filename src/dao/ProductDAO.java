@@ -5,7 +5,6 @@ import entities.Producto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import utils.CacheManager;
-
 import java.util.List;
 
 /**
@@ -184,5 +183,45 @@ public class ProductDAO extends genericDAO<Producto> {
      */
     public static void clearAllCache() {
         CacheManager.clear();
+    }
+    /**
+     * Obtiene un producto con TODAS sus relaciones inicializadas
+     * Ideal para reportes y operaciones fuera de la sesión de Hibernate
+     */
+    public Producto findByItemIdWithFullDetails(String itemId) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            // Query con JOIN FETCH de TODO
+            Producto producto = em.createQuery(
+                            "SELECT DISTINCT p FROM Producto p " +
+                                    "LEFT JOIN FETCH p.idSeller s " +
+                                    "LEFT JOIN FETCH s.marketplace " +
+                                    "LEFT JOIN FETCH p.idCategory " +
+                                    "LEFT JOIN FETCH p.idCondition " +
+                                    "LEFT JOIN FETCH p.idCoupon " +
+                                    "WHERE p.itemId = :itemId",
+                            Producto.class)
+                    .setParameter("itemId", itemId)
+                    .getSingleResult();
+
+            System.out.println("✅ Producto cargado con JOIN FETCH");
+            System.out.println("  - Vendedor: " + (producto.getIdSeller() != null ? producto.getIdSeller().getUsername() : "NULL"));
+            System.out.println("  - Marketplace: " + (producto.getIdSeller() != null && producto.getIdSeller().getMarketplace() != null ?
+                    producto.getIdSeller().getMarketplace().getNameMarketplace() : "NULL"));
+            System.out.println("  - Categoría: " + (producto.getIdCategory() != null ? producto.getIdCategory().getCategoryPath() : "NULL"));
+            System.out.println("  - Condición: " + (producto.getIdCondition() != null ? producto.getIdCondition().getConditionPath() : "NULL"));
+
+            return producto;
+
+        } catch (NoResultException e) {
+            System.out.println("⚠️ No se encontró producto con itemId: " + itemId);
+            return null;
+        } catch (Exception e) {
+            System.err.println("❌ Error obteniendo producto completo: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        } finally {
+            em.close();
+        }
     }
 }

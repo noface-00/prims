@@ -3,6 +3,7 @@ package interfaz.controllers;
 import api.conect_API_eBay;
 import dao.*;
 import entities.*;
+import jakarta.persistence.EntityManager;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -26,9 +27,10 @@ import java.awt.*;
 import java.net.URI;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * Controlador optimizado del módulo de análisis de producto.
@@ -415,17 +417,28 @@ public class ProductAnalysisController {
             return;
         }
 
-        double promedio = precios.stream().mapToDouble(d -> d).average().orElse(0);
-        double min = precios.stream().min(Double::compare).orElse(0.0);
-        double max = precios.stream().max(Double::compare).orElse(0.0);
+        // Filtrar outliers
+        List<Double> preciosFiltrados = filtrarOutliers(precios);
 
-        double variance = precios.stream()
+        double promedio = preciosFiltrados.stream().mapToDouble(d -> d).average().orElse(0);
+        double min = preciosFiltrados.stream().min(Double::compare).orElse(0.0);
+        double max = preciosFiltrados.stream().max(Double::compare).orElse(0.0);
+
+        double variance = preciosFiltrados.stream()
                 .mapToDouble(p -> Math.pow(p - promedio, 2))
                 .average()
                 .orElse(0);
 
         double desviacion = Math.sqrt(variance);
         double diferencia = precioActual - promedio;
+        double coefVariacion = promedio > 0 ? (desviacion / promedio) * 100 : 0;
+
+        String estabilidad = coefVariacion < 20 ? "Alta estabilidad" :
+                coefVariacion < 40 ? "Variabilidad moderada" :
+                        "Alta variabilidad";
+
+        String confianza = calcularConfianzaAnalisis(preciosFiltrados.size(), desviacion, promedio);
+        String alertaPrecio = detectarAlertaPrecio(precioActual, promedio, desviacion);
 
         analisisActual.setMarketAverage(promedio);
         analisisActual.setMarketMin(min);
@@ -436,10 +449,15 @@ public class ProductAnalysisController {
         Platform.runLater(() -> {
             txtPromedioMercado.setText(String.format("Promedio mercado: USD %.2f\n", promedio));
             txtRango.setText(String.format("Rango: USD %.2f – %.2f\n", min, max));
-            txtEstabilidad.setText(String.format("Desviación estándar: %.2f\n", desviacion));
+            txtEstabilidad.setText(String.format(
+                    "Desviación: %.2f (%.1f%%)\n%s\n" +
+                            "Productos analizados: %d\n" +
+                            "Confianza del análisis: %s\n" +
+                            "Estado del precio: %s\n",
+                    desviacion, coefVariacion, estabilidad, preciosFiltrados.size(), confianza, alertaPrecio
+            ));
         });
     }
-
     private void procesarHistorial(List<PriceHistory> historial) {
         Platform.runLater(() -> llenarGraficoHistorialReal(historial));
     }
@@ -608,30 +626,108 @@ public class ProductAnalysisController {
 
     @FXML
     private void onReportGenerated() {
-        if (productoActual == null || analisisActual == null) {
-            System.err.println("❌ No hay análisis disponible para generar reporte");
+        System.out.println("🔍 Iniciando generación de reporte...");
+
+        if (productoActual == null) {
+            NotificationManager.error("❌ No hay producto cargado");
             return;
         }
 
-        Task<Void> reportTask = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                ProductDAO productDAO = new ProductDAO();
-                Producto productoCompleto = productDAO.read(productoActual.getItemId());
+        if (analisisActual == null) {
+            NotificationManager.error("❌ No hay análisis disponible");
+            return;
+        }
 
-                if (productoCompleto != null) {
-                    ReportService.generarReporteUnico(productoCompleto, analisisActual);
-                    Platform.runLater(() ->
-                            System.out.println("📄 Reporte PDF generado exitosamente")
+        if (progressIndicator != null) {
+            progressIndicator.setVisible(true);
+        }
+
+        Task<Boolean> reportTask = new Task<>() {
+            @Override
+            protected Boolean call() throws Exception {
+                EntityManager em = null;
+                try {
+                    System.out.println("📦 Inicializando todo dentro de la sesión de Hibernate...");
+
+                    // Crear EntityManager para mantener sesión abierta
+                    em = genericDAO.getEmf().createEntityManager();
+
+                    ProductDAO productDAO = new ProductDAO();
+
+                    // Obtener producto con todas las relaciones
+                    Producto productoCompleto = productDAO.findByItemIdWithFullDetails(
+                            productoActual.getItemId()
                     );
+
+                    if (productoCompleto == null) {
+                        System.err.println("❌ No se pudo obtener el producto");
+                        return false;
+                    }
+
+                    // También inicializar el análisis dentro de la sesión
+                    ProductAnalysis analisisCompleto = em.merge(analisisActual);
+
+                    // Forzar inicialización del vendedor en el análisis
+                    if (analisisCompleto.getIdSeller() != null) {
+                        org.hibernate.Hibernate.initialize(analisisCompleto.getIdSeller());
+                        if (analisisCompleto.getIdSeller().getMarketplace() != null) {
+                            org.hibernate.Hibernate.initialize(analisisCompleto.getIdSeller().getMarketplace());
+                        }
+                    }
+
+                    System.out.println("✅ Todo inicializado correctamente");
+                    System.out.println("🔧 Generando reporte PDF...");
+
+                    // Generar el reporte
+                    ReportService.generarReporteUnico(productoCompleto, analisisCompleto);
+
+                    return true;
+
+                } catch (Exception e) {
+                    System.err.println("❌ Error en generación de reporte:");
+                    e.printStackTrace();
+                    return false;
+                } finally {
+                    if (em != null && em.isOpen()) {
+                        em.close();
+                    }
                 }
-                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                if (progressIndicator != null) {
+                    progressIndicator.setVisible(false);
+                }
+
+                Boolean resultado = getValue();
+                if (resultado != null && resultado) {
+                    System.out.println("Reporte generado exitosamente");
+                    NotificationManager.success("Reporte guardado en Descargas");
+                } else {
+                    NotificationManager.error("Error al generar el reporte");
+                }
+            }
+
+            @Override
+            protected void failed() {
+                if (progressIndicator != null) {
+                    progressIndicator.setVisible(false);
+                }
+
+                Throwable exception = getException();
+                if (exception != null) {
+                    exception.printStackTrace();
+                }
+
+                NotificationManager.error("Error al generar el reporte PDF");
             }
         };
 
-        new Thread(reportTask).start();
+        Thread thread = new Thread(reportTask);
+        thread.setDaemon(true);
+        thread.start();
     }
-
     @FXML
     private void onClicked() {
         content.setVisible(!content.isVisible());
@@ -718,5 +814,319 @@ public class ProductAnalysisController {
         }
     }
 
+// ═══════════════════════════════════════════════════════
+// 🆕 MÉTODOS DE ANÁLISIS MEJORADO - AGREGAR AL FINAL
+// ═══════════════════════════════════════════════════════
 
+    /**
+     * 📊 Analiza el mercado completo con filtros mejorados
+     */
+    private Map<String, Object> analizarMercadoCompleto(String nombreProducto, String condicion) {
+        Map<String, Object> resultado = new HashMap<>();
+
+        try {
+            // Verificar caché primero
+            List<Double> cached = marketPriceCache.get(nombreProducto);
+            List<Double> precios;
+
+            if (cached != null && !cached.isEmpty()) {
+                System.out.println("♻️ Precios de mercado obtenidos desde caché");
+                precios = cached;
+            } else {
+                // Construir query inteligente
+                String queryMejorada = construirQueryInteligente(nombreProducto);
+
+                // Obtener precios del mercado
+                precios = api.obtenerPreciosDelMercado(queryMejorada, token);
+
+                if (precios != null && !precios.isEmpty()) {
+                    marketPriceCache.put(nombreProducto, precios);
+                }
+            }
+
+            if (precios == null || precios.isEmpty()) {
+                resultado.put("promedio", 0.0);
+                resultado.put("min", 0.0);
+                resultado.put("max", 0.0);
+                resultado.put("desviacion", 0.0);
+                resultado.put("cantidad", 0);
+                return resultado;
+            }
+
+            // Filtrar outliers extremos
+            List<Double> preciosFiltrados = filtrarOutliers(precios);
+
+            // Calcular estadísticas
+            DoubleSummaryStatistics stats = preciosFiltrados.stream()
+                    .mapToDouble(Double::doubleValue)
+                    .summaryStatistics();
+
+            double promedio = stats.getAverage();
+            double varianza = preciosFiltrados.stream()
+                    .mapToDouble(p -> Math.pow(p - promedio, 2))
+                    .average()
+                    .orElse(0);
+            double desviacion = Math.sqrt(varianza);
+
+            resultado.put("promedio", Math.round(promedio * 100.0) / 100.0);
+            resultado.put("min", Math.round(stats.getMin() * 100.0) / 100.0);
+            resultado.put("max", Math.round(stats.getMax() * 100.0) / 100.0);
+            resultado.put("desviacion", Math.round(desviacion * 100.0) / 100.0);
+            resultado.put("cantidad", preciosFiltrados.size());
+
+        } catch (Exception e) {
+            System.err.println("Error en análisis de mercado: " + e.getMessage());
+            resultado.put("promedio", 0.0);
+            resultado.put("min", 0.0);
+            resultado.put("max", 0.0);
+            resultado.put("desviacion", 0.0);
+            resultado.put("cantidad", 0);
+        }
+
+        return resultado;
+    }
+
+    /**
+     * 🔍 Construye una query inteligente eliminando ruido
+     */
+    private String construirQueryInteligente(String nombreProducto) {
+        String[] stopWords = {"nuevo", "usado", "original", "garantía", "envío", "gratis",
+                "new", "used", "free", "shipping"};
+        String query = nombreProducto.toLowerCase();
+
+        for (String stop : stopWords) {
+            query = query.replaceAll("\\b" + stop + "\\b", "");
+        }
+
+        String[] palabras = query.trim().split("\\s+");
+        int maxPalabras = Math.min(5, palabras.length);
+
+        return String.join(" ", Arrays.copyOfRange(palabras, 0, maxPalabras)).trim();
+    }
+
+    /**
+     * 📉 Filtra outliers usando método IQR
+     */
+    private List<Double> filtrarOutliers(List<Double> precios) {
+        if (precios.size() < 4) return precios;
+
+        List<Double> sorted = new ArrayList<>(precios);
+        Collections.sort(sorted);
+
+        int n = sorted.size();
+        double q1 = sorted.get(n / 4);
+        double q3 = sorted.get(3 * n / 4);
+        double iqr = q3 - q1;
+
+        double limiteInferior = q1 - 1.5 * iqr;
+        double limiteSuperior = q3 + 1.5 * iqr;
+
+        return precios.stream()
+                .filter(p -> p >= limiteInferior && p <= limiteSuperior)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 🚨 Detecta si el precio es sospechoso
+     */
+    private String detectarAlertaPrecio(double precio, double promedio, double desviacion) {
+        if (promedio == 0 || desviacion == 0) {
+            return "⚪ Sin datos de mercado suficientes";
+        }
+
+        double zScore = (promedio - precio) / desviacion;
+
+        if (zScore > 3) {
+            double descuento = ((promedio - precio) / promedio) * 100;
+            return "🚨 ALERTA: Precio sospechosamente bajo (-" +
+                    String.format("%.0f", descuento) + "%)";
+        } else if (zScore > 2) {
+            return "⚠️ ADVERTENCIA: Precio muy por debajo del mercado";
+        } else if (precio < promedio * 0.7) {
+            return "💡 OPORTUNIDAD: Precio 30% por debajo del promedio";
+        } else if (precio > promedio * 1.3) {
+            return "📈 PRECIO ALTO: 30% por encima del promedio";
+        } else if (Math.abs(precio - promedio) < desviacion * 0.5) {
+            return "✅ Precio justo, dentro del rango normal";
+        }
+
+        return "🟡 Precio aceptable";
+    }
+
+    /**
+     * 🔍 Evalúa confiabilidad del vendedor
+     */
+    private String evaluarConfiabilidadVendedor(Seller vendedor) {
+        double feedback = vendedor.getFeedbackPorcentage();
+        int score = vendedor.getFeedbackScore();
+
+        if (feedback >= 99 && score >= 5000) {
+            return "🟢 VENDEDOR TOP";
+        } else if (feedback >= 98 && score >= 1000) {
+            return "🟢 MUY CONFIABLE";
+        } else if (feedback >= 95 && score >= 100) {
+            return "🟡 CONFIABLE";
+        } else if (feedback >= 90 && score >= 50) {
+            return "🟡 PROMEDIO";
+        } else if (feedback < 85 || score < 10) {
+            return "🔴 POCO CONFIABLE";
+        }
+
+        return "⚪ SIN SUFICIENTES DATOS";
+    }
+
+    /**
+     * 🎯 TrustScore mejorado con Z-score
+     */
+    private double calcularTrustScoreMejorado(double precio, double promedioMercado,
+                                              double desviacion, Seller vendedor,
+                                              String antiguedad) {
+        double score = 0;
+
+        // 1. Precio competitivo (35 pts) - Usando Z-score
+        if (desviacion > 0 && promedioMercado > 0) {
+            double zScore = Math.abs((precio - promedioMercado) / desviacion);
+
+            if (zScore <= 1) score += 35;
+            else if (zScore <= 2) score += 25;
+            else if (zScore <= 3) score += 10;
+        }
+
+        // 2. Feedback positivo (30 pts)
+        double feedbackPct = vendedor.getFeedbackPorcentage();
+        if (feedbackPct >= 99) score += 30;
+        else if (feedbackPct >= 98) score += 27;
+        else if (feedbackPct >= 95) score += 22;
+        else if (feedbackPct >= 90) score += 15;
+        else if (feedbackPct >= 80) score += 5;
+
+        // 3. Volumen de feedback (20 pts)
+        int feedbackScore = vendedor.getFeedbackScore();
+        if (feedbackScore >= 10000) score += 20;
+        else if (feedbackScore >= 5000) score += 18;
+        else if (feedbackScore >= 1000) score += 15;
+        else if (feedbackScore >= 500) score += 12;
+        else if (feedbackScore >= 100) score += 8;
+        else if (feedbackScore >= 50) score += 5;
+        else if (feedbackScore >= 10) score += 2;
+
+        // 4. Antigüedad (15 pts)
+        try {
+            if (antiguedad.contains("año")) {
+                String[] parts = antiguedad.split(" ");
+                int años = Integer.parseInt(parts[0]);
+                score += Math.min(años * 2.5, 15);
+            } else if (antiguedad.contains("mes")) {
+                String[] parts = antiguedad.split(" ");
+                for (int i = 0; i < parts.length; i++) {
+                    if (parts[i].contains("mes") && i > 0) {
+                        int meses = Integer.parseInt(parts[i - 1]);
+                        score += Math.min(meses * 0.5, 6);
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // No suma puntos si hay error
+        }
+
+        return Math.min(100, Math.round(score * 10) / 10.0);
+    }
+
+    /**
+     * 🎯 Calcula indicador de confianza
+     */
+    private String calcularConfianzaAnalisis(int cantidadPrecios,
+                                             double desviacionEstandar,
+                                             double promedio) {
+        if (promedio == 0) return "⚪ Sin datos";
+
+        double coefVariacion = (desviacionEstandar / promedio) * 100;
+
+        if (cantidadPrecios < 5) {
+            return "🔴 Muy Baja (muestra insuficiente)";
+        } else if (cantidadPrecios < 15) {
+            return "🟡 Baja (muestra pequeña)";
+        } else if (coefVariacion > 50) {
+            return "🟡 Media (alta variabilidad)";
+        } else if (cantidadPrecios >= 30 && coefVariacion < 30) {
+            return "🟢 Alta (muestra robusta)";
+        } else if (cantidadPrecios >= 20 && coefVariacion < 40) {
+            return "🟢 Buena";
+        }
+
+        return "🟡 Media";
+    }
+
+    /**
+     * 📈 Analiza tendencia del historial
+     */
+    private void analizarTendencia(List<PriceHistory> historial) {
+        if (historial == null || historial.size() < 2) {
+            return;
+        }
+
+        historial.sort(Comparator.comparing(PriceHistory::getRecordedAt));
+
+        double precioInicial = historial.get(0).getPrice();
+        double precioFinal = historial.get(historial.size() - 1).getPrice();
+        double cambio = ((precioFinal - precioInicial) / precioInicial) * 100;
+
+        double[] precios = historial.stream()
+                .mapToDouble(PriceHistory::getPrice)
+                .toArray();
+
+        double volatilidad = calcularVolatilidad(precios);
+
+        String iconoTendencia;
+        String textoTendencia;
+
+        if (cambio > 10) {
+            iconoTendencia = "📈";
+            textoTendencia = "Tendencia alcista fuerte";
+        } else if (cambio > 5) {
+            iconoTendencia = "📈";
+            textoTendencia = "Tendencia al alza";
+        } else if (cambio < -10) {
+            iconoTendencia = "📉";
+            textoTendencia = "Tendencia bajista fuerte";
+        } else if (cambio < -5) {
+            iconoTendencia = "📉";
+            textoTendencia = "Tendencia a la baja";
+        } else {
+            iconoTendencia = "➡️";
+            textoTendencia = "Precio estable";
+        }
+
+        String cambioTexto = String.format("%+.1f%%", cambio);
+
+        String volatilidadTexto;
+        if (volatilidad < 5) {
+            volatilidadTexto = "Baja volatilidad (precio estable)";
+        } else if (volatilidad < 15) {
+            volatilidadTexto = "Volatilidad moderada";
+        } else {
+            volatilidadTexto = "Alta volatilidad (precio inestable)";
+        }
+
+        String textoActual = txtEstabilidad.getText();
+        txtEstabilidad.setText(textoActual +
+                "\n" + iconoTendencia + " " + textoTendencia + " (" + cambioTexto + ")\n" +
+                volatilidadTexto + " (" + String.format("%.1f%%", volatilidad) + ")\n");
+    }
+
+    /**
+     * 📊 Calcula volatilidad
+     */
+    private double calcularVolatilidad(double[] precios) {
+        if (precios.length < 2) return 0;
+
+        double suma = 0;
+        for (int i = 1; i < precios.length; i++) {
+            double cambio = (precios[i] - precios[i - 1]) / precios[i - 1];
+            suma += cambio * cambio;
+        }
+
+        return Math.sqrt(suma / (precios.length - 1)) * 100;
+    }
 }
