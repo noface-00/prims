@@ -231,26 +231,39 @@ public class GalleryController {
     /** ============================================================
      APLICAR FILTRO
      ============================================================ */
-
     @FXML
     private void applyFiltersButton() {
         try {
-
-            // 🔸 FILTROS
+            // FILTROS DE PRECIOS
             Double min = txtPrecioMin.getText().isEmpty() ? null : Double.parseDouble(txtPrecioMin.getText());
             Double max = txtPrecioMax.getText().isEmpty() ? null : Double.parseDouble(txtPrecioMax.getText());
 
+            // VALIDAR CONDICIÓN (solo 1)
             String condition = null;
-            if (cbNuevo.isSelected()) condition = "new";
-            if (cbUsado.isSelected()) condition = "used";
 
+            if (cbNuevo.isSelected() && cbUsado.isSelected()) {
+                NotificationManager.warning("Selecciona solo una condición: Nuevo o Usado.");
+                return;
+            } else if (cbNuevo.isSelected()) {
+                condition = "new";
+            } else if (cbUsado.isSelected()) {
+                condition = "used";
+            }
+
+            // VALIDAR SORT (solo 1)
             String sort = null;
-            if (cbMenorPrecio.isSelected()) sort = "asc";
-            if (cbMayorPrecio.isSelected()) sort = "desc";
-            if (cbMasRecientes.isSelected()) sort = "recent";
+            int sortCount = 0;
 
-            System.out.println("🔎 Buscando con filtros → " + searchTerm);
+            if (cbMenorPrecio.isSelected()) { sort = "price_asc"; sortCount++; }
+            if (cbMayorPrecio.isSelected()) { sort = "price_desc"; sortCount++; }
+            if (cbMasRecientes.isSelected()) { sort = "recent"; sortCount++; }
 
+            if (sortCount > 1) {
+                NotificationManager.warning("Selecciona solo un ordenamiento.");
+                return;
+            }
+
+            // HACER LA CONSULTA
             List<Producto> filtrados = apiLoader.obtenerProductos(
                     token,
                     searchTerm,
@@ -260,10 +273,11 @@ public class GalleryController {
                     sort
             );
 
+            // Render
             allProducts.clear();
             allProducts.addAll(filtrados);
-
             currentPage = 1;
+
             renderPage();
             updatePaginationButtons();
 
@@ -271,4 +285,5 @@ public class GalleryController {
             e.printStackTrace();
         }
     }
+
 }

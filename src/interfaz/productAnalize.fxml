@@ -29,8 +29,8 @@
                     <Text fx:id="lblTitle" style="-fx-font-family:Poppins SemiBold; -fx-font-size:16;" text="Título del Producto" />
                     <TextFlow fx:id="flowPrecio" lineSpacing="4" prefWidth="260" style="-fx-background-color: white; -fx-padding: 8; -fx-background-radius: 6;">
                         <Text fx:id="txtPrecioActual" style="-fx-font-family: Poppins SemiBold; -fx-fill: black; -fx-font-size: 14;" text="Precio actual: $0.00\n" />
-                        <Text fx:id="txtPromedio" style="-fx-font-family:Poppins; -fx-fill:#555; -fx-font-size:13;" text="Promedio mercado: $0.00\n" />
-                        <Text fx:id="txtDiferencia" style="-fx-font-family:Poppins; -fx-fill:#888; -fx-font-size:13;" text="Variación: 0%\n" />
+                        <Text fx:id="txtPromedio" style="-fx-font-family:Poppins SemiBold; -fx-fill:#555; -fx-font-size:13;" text="Promedio mercado: $0.00\n" />
+                        <Text fx:id="txtDiferencia" style="-fx-font-family:Poppins SemiBold; -fx-fill:#888; -fx-font-size:13;" text="Variación: 0%\n" />
                     </TextFlow>
                 </children>
                 <padding>
@@ -70,41 +70,67 @@
         <children>
 
             <!-- INFORMACIÓN DEL VENDEDOR -->
-            <VBox spacing="6">
+            <VBox spacing="6" visible="true">
                 <padding>
                     <Insets bottom="10" left="10" right="10" top="10" />
                 </padding>
                 <Label style="-fx-font-family:Poppins SemiBold; -fx-font-size:16;" text="Información del Vendedor" />
-                <TextFlow fx:id="flowVendedor" lineSpacing="4" prefWidth="560" style="-fx-background-color:#F8F8F8; -fx-padding:10; -fx-background-radius:6;">
-                    <Text fx:id="txtVendedorNombre" style="-fx-font-family:Poppins SemiBold; -fx-fill:#222; -fx-font-size:13;" text="Vendedor: --\n" />
-                    <Text fx:id="txtFeedback" style="-fx-font-family:Poppins; -fx-fill:#444; -fx-font-size:13;" text="Feedback positivo: 0%\n" />
-                    <Text fx:id="txtFeedbackScore" style="-fx-font-family: Poppins; -fx-fill: black; -fx-font-size: 13;" text="Feedback puntuacion: 0\n" />
-                    <Text fx:id="txtAntiguedad" style="-fx-font-family: Poppins; -fx-fill: black; -fx-font-size: 13;" text="Antigüedad: --\n" />
-                    <Text fx:id="txtTrustScore" style="-fx-font-family:Poppins SemiBold; -fx-fill:#1F8A70; -fx-font-size:13;" text="TrustScore: 0 / 100\n" />
-                    <Text fx:id="txtTotalProductos"/>
-                    <Text fx:id="txtPromedioVariacionGeneral"/>
-                    <Text fx:id="txtTopVariacionesPositivas"/>
-                    <Text fx:id="txtTopVariacionesNegativas"/>
-                    <Text fx:id="txtResumenConsultasDiarias"/>
-
+                <TextFlow fx:id="flowVendedor" lineSpacing="4" prefWidth="560" style="-fx-background-color:#ffffff; -fx-padding:10; -fx-background-radius:6;">
+                    <Text fx:id="txtVendedorNombre" style="-fx-font-family:'Poppins Light'; -fx-fill:#222; -fx-font-size:13;" text="Vendedor: --\n" />
+                    <Text fx:id="txtFeedback" style="-fx-font-family:'Poppins Light'; -fx-fill:#000000; -fx-font-size:13;" text="Feedback positivo: 0%\n" />
+                    <Text fx:id="txtFeedbackScore" style="-fx-font-family:'Poppins Light'; -fx-fill: black; -fx-font-size: 13;" text="Feedback puntuacion: 0\n" />
+                    <Text fx:id="txtAntiguedad" style="-fx-font-family:'Poppins Light'; -fx-fill: black; -fx-font-size: 13;" text="Antigüedad: --\n" />
+                    <Text fx:id="txtTrustScore" style="-fx-font-family:'Poppins Light'; -fx-fill:#000000; -fx-font-size:13;" text="TrustScore: 0 / 100\n" />
                 </TextFlow>
             </VBox>
 
             <!-- ANÁLISIS DE PRECIO -->
-            <VBox spacing="6">
+            <VBox spacing="6" visible="true">
                 <padding>
                     <Insets bottom="10" left="10" right="10" top="10" />
                 </padding>
+            <Label style="-fx-font-family:Poppins SemiBold; -fx-font-size:16;" text="Mejores precios de productos similares" />
+            <TextFlow prefHeight="200.0" prefWidth="200.0">
+               <children>
+   
+                       <Text fx:id="txtTopVariacionesPositivas" style="-fx-font-family:'Poppins Light'; -fx-fill:#000000; -fx-font-size:13;" text="" />
+               </children>
+            </TextFlow>
+            <Label style="-fx-font-family:Poppins SemiBold; -fx-font-size:16;" text="Peores precios de productos similares" />
+            <TextFlow prefHeight="200.0" prefWidth="200.0">
+               <children>
+   
+                       <Text fx:id="txtTopVariacionesNegativas" style="-fx-font-family:'Poppins Light'; -fx-fill:#000000; -fx-font-size:13;" text="" />
+               </children>
+            </TextFlow>
                 <Label style="-fx-font-family:Poppins SemiBold; -fx-font-size:16;" text="Análisis de Precio" />
-                <TextFlow fx:id="flowAnalisis" lineSpacing="4" prefWidth="560" style="-fx-background-color:#F8F8F8; -fx-padding:10; -fx-background-radius:6;">
-                    <Text fx:id="txtPromedioMercado" style="-fx-font-family:Poppins; -fx-fill:#333; -fx-font-size:13;" text="Promedio: --\n" />
-                    <Text fx:id="txtRango" style="-fx-font-family:Poppins; -fx-fill:#555; -fx-font-size:13;" text="Rango: $-- a $--\n" />
-                    <Text fx:id="txtEstabilidad" style="-fx-font-family:Poppins; -fx-fill:#777; -fx-font-size:13;" text="Desviación estándar: --\n" />
+                <TextFlow fx:id="flowAnalisis" lineSpacing="4" prefWidth="560" style="-fx-background-color:#ffffff; -fx-padding:10; -fx-background-radius:6;">
+
+                    <!-- Promedio de mercado -->
+                    <Text fx:id="txtPromedioMercado" style="-fx-font-family:'Poppins Light'; -fx-fill:#000000; -fx-font-size:13;" text="Promedio: --&#10;" />
+
+                    <!-- Rango -->
+                    <Text fx:id="txtRango" style="-fx-font-family:'Poppins Light'; -fx-fill:#000000; -fx-font-size:13;" text="Rango: $-- a $--&#10;" />
+
+                    <!-- Estabilidad / Desviación -->
+                    <Text fx:id="txtEstabilidad" style="-fx-font-family:'Poppins Light'; -fx-fill:#000000; -fx-font-size:13;" text="Desviación estándar: --&#10;" />
+
+                    <!-- Total productos analizados -->
+                    <Text fx:id="txtTotalProductos" style="-fx-font-family:'Poppins Light'; -fx-fill:#000000; -fx-font-size:13;" text="Total analizados: --&#10;" />
+
+                    <!-- Promedio de variación general -->
+                    <Text fx:id="txtPromedioVariacionGeneral" style="-fx-font-family:'Poppins Light'; -fx-fill:#000000; -fx-font-size:13;" text="Promedio variación: --&#10;" />
+                    
+
+                    <!-- Resumen consultas diarias -->
+                    <Text fx:id="txtResumenConsultasDiarias" style="-fx-font-family:'Poppins Light'; -fx-fill:#000000; -fx-font-size:13;" text="" />
+
                 </TextFlow>
+
             </VBox>
 
             <!-- HISTORIAL -->
-            <VBox spacing="6">
+            <VBox spacing="6" visible="true">
                 <padding>
                     <Insets bottom="10" left="10" right="10" top="10" />
                 </padding>

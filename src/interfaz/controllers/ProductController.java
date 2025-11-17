@@ -510,13 +510,18 @@ public class ProductController {
 
 
 
-            //mostrarAlerta("Éxito", "Producto guardado correctamente con todas sus relaciones.", Alert.AlertType.INFORMATION);
             System.out.println("✅ Producto completo guardado: " + producto.getName());
 
         } catch (Exception e) {
             e.printStackTrace();
-            //mostrarAlerta("Error", "Error al guardar producto: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+
     }
+
+    public void guardarProductoDirecto(Producto p) {
+        this.producto = p;
+        guardarProducto(); // usa tu método existente, pero sin vista
+    }
+
 
 }

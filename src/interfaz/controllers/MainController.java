@@ -426,5 +426,9 @@ public class MainController {
     public void actualizarWishlistCount(int count) {
         lblNumSave.setText(String.valueOf(count));
     }
+    public void guardarProductoDesdeCard(Producto producto) {
+        ProductController pc = new ProductController();
+        pc.guardarProductoDirecto(producto);
+    }
 
 }

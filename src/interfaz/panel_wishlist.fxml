@@ -4,7 +4,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color:transparent;" stylesheets="@css/style.css" vbarPolicy="AS_NEEDED" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="interfaz.controllers.AcordPanelController">
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" hmax="0.0" style="-fx-background-color:transparent;" stylesheets="@css/style.css" vbarPolicy="AS_NEEDED" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="interfaz.controllers.AcordPanelController">
 
     <content>
         <VBox fx:id="acordPanel" fillWidth="true" spacing="12" style="-fx-background-color:transparent;">

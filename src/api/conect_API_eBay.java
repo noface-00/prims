@@ -4,15 +4,21 @@ import com.google.gson.*;
 import utils.ErrorHandler;
 import utils.NotificationManager;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 public class conect_API_eBay {
 
@@ -317,25 +323,189 @@ public class conect_API_eBay {
         JsonObject item = gson.fromJson(response.body(), JsonObject.class);
         JsonObject nuevo = new JsonObject();
 
-        // Procesar campos (tu código actual aquí, pero con manejo de errores)
         try {
-            // Descripción corta
+
+            // ==========================
+            // 📝 DESCRIPCIÓN
+            // ==========================
             nuevo.addProperty("shortDescription",
                     item.has("shortDescription") && !item.get("shortDescription").isJsonNull()
                             ? item.get("shortDescription").getAsString()
                             : "Sin descripción disponible");
 
-            // Opciones de envío
+
+
+            // ==========================
+            // 📦 OPCIONES DE ENVÍO (shippingOptions)
+            // ==========================
             if (item.has("shippingOptions") && item.get("shippingOptions").isJsonArray()) {
+
                 JsonArray shippingArray = new JsonArray();
+
                 for (JsonElement shipElem : item.getAsJsonArray("shippingOptions")) {
-                    // ... tu código de procesamiento
+                    JsonObject ship = shipElem.getAsJsonObject();
+                    JsonObject envio = new JsonObject();
+
+                    // Tipo de envío
+                    envio.addProperty("type",
+                            ship.has("type") ? ship.get("type").getAsString() : "N/A");
+
+                    // Transportista
+                    envio.addProperty("shippingCarrierCode",
+                            ship.has("shippingCarrierCode") ? ship.get("shippingCarrierCode").getAsString() : "N/A");
+
+                    // Costo principal
+                    if (ship.has("shippingCost") && ship.get("shippingCost").isJsonObject()) {
+                        JsonObject cost = ship.getAsJsonObject("shippingCost");
+                        JsonObject costoEnvio = new JsonObject();
+                        costoEnvio.addProperty("value", cost.has("value") ? cost.get("value").getAsString() : "0.00");
+                        costoEnvio.addProperty("currency", cost.has("currency") ? cost.get("currency").getAsString() : "USD");
+                        envio.add("shippingCost", costoEnvio);
+                    }
+
+                    // Cantidad usada para estimación
+                    envio.addProperty("quantityUsedForEstimate",
+                            ship.has("quantityUsedForEstimate") ? ship.get("quantityUsedForEstimate").getAsInt() : 0);
+
+                    // Fechas estimadas
+                    envio.addProperty("minEstimatedDeliveryDate",
+                            ship.has("minEstimatedDeliveryDate") ? ship.get("minEstimatedDeliveryDate").getAsString() : "N/A");
+                    envio.addProperty("maxEstimatedDeliveryDate",
+                            ship.has("maxEstimatedDeliveryDate") ? ship.get("maxEstimatedDeliveryDate").getAsString() : "N/A");
+
+                    // Costo adicional por unidad
+                    if (ship.has("additionalShippingCostPerUnit") && ship.get("additionalShippingCostPerUnit").isJsonObject()) {
+                        JsonObject addCost = ship.getAsJsonObject("additionalShippingCostPerUnit");
+                        JsonObject costoAdicional = new JsonObject();
+                        costoAdicional.addProperty("value", addCost.has("value") ? addCost.get("value").getAsString() : "0.00");
+                        costoAdicional.addProperty("currency", addCost.has("currency") ? addCost.get("currency").getAsString() : "USD");
+                        envio.add("additionalShippingCostPerUnit", costoAdicional);
+                    }
+
+                    // Tipo de costo
+                    envio.addProperty("shippingCostType",
+                            ship.has("shippingCostType") ? ship.get("shippingCostType").getAsString() : "N/A");
+
+                    shippingArray.add(envio);
                 }
+
                 nuevo.add("shippingOptions", shippingArray);
             }
 
-            // ... resto de campos
 
+
+            // ==========================
+            // 🔄 POLÍTICA DE DEVOLUCIONES
+            // ==========================
+            if (item.has("returnTerms") && item.get("returnTerms").isJsonObject()) {
+                JsonObject returnTerms = item.getAsJsonObject("returnTerms");
+                boolean returnsAccepted = returnTerms.has("returnsAccepted")
+                        && returnTerms.get("returnsAccepted").getAsBoolean();
+
+                nuevo.addProperty("returnsAccepted", returnsAccepted);
+            } else {
+                nuevo.addProperty("returnsAccepted", false);
+            }
+
+
+
+            // ==========================
+            // 🎟 CUPÓNES DISPONIBLES
+            // ==========================
+            if (item.has("availableCoupons") && item.get("availableCoupons").isJsonArray()) {
+                JsonArray couponsArray = new JsonArray();
+
+                for (JsonElement couponElem : item.getAsJsonArray("availableCoupons")) {
+                    if (!couponElem.isJsonObject()) continue;
+
+                    JsonObject coupon = couponElem.getAsJsonObject();
+                    JsonObject nuevoCoupon = new JsonObject();
+
+                    // Código
+                    if (coupon.has("redemptionCode"))
+                        nuevoCoupon.addProperty("redemptionCode", coupon.get("redemptionCode").getAsString());
+
+                    // Monto de descuento
+                    if (coupon.has("discountAmount") && coupon.get("discountAmount").isJsonObject()) {
+                        JsonObject discount = coupon.getAsJsonObject("discountAmount");
+                        nuevoCoupon.addProperty("discountAmount",
+                                discount.has("value") ? discount.get("value").getAsString() : "0.00");
+                    }
+
+                    // Fecha expiración
+                    if (coupon.has("constraint") && coupon.get("constraint").isJsonObject()) {
+                        JsonObject constraint = coupon.getAsJsonObject("constraint");
+                        if (constraint.has("expirationDate"))
+                            nuevoCoupon.addProperty("expirationDate", constraint.get("expirationDate").getAsString());
+                    }
+
+                    couponsArray.add(nuevoCoupon);
+                }
+
+                nuevo.add("availableCoupons", couponsArray);
+            }
+
+
+
+            // ==========================
+            // 📦 DISPONIBILIDAD ESTIMADA
+            // ==========================
+            if (item.has("estimatedAvailabilities")) {
+
+                JsonArray availArray = item.getAsJsonArray("estimatedAvailabilities");
+
+                if (!availArray.isEmpty()) {
+                    JsonObject first = availArray.get(0).getAsJsonObject();
+
+                    if (first.has("estimatedAvailabilityStatus")) {
+                        nuevo.addProperty("status", first.get("estimatedAvailabilityStatus").getAsString());
+                    }
+                }
+            }
+
+
+
+            // ==========================
+            // 🔧 ATRIBUTOS DEL PRODUCTO (localizedAspects)
+            // ==========================
+            if (item.has("localizedAspects") && item.get("localizedAspects").isJsonArray()) {
+
+                JsonArray aspectosLimpios = new JsonArray();
+
+                for (JsonElement aspectElem : item.getAsJsonArray("localizedAspects")) {
+                    if (!aspectElem.isJsonObject()) continue;
+
+                    JsonObject aspect = aspectElem.getAsJsonObject();
+                    JsonObject atributo = new JsonObject();
+
+                    // name
+                    if (aspect.has("name"))
+                        atributo.addProperty("name", aspect.get("name").getAsString());
+
+                    // value
+                    if (aspect.has("value")) {
+                        JsonElement valor = aspect.get("value");
+                        atributo.addProperty("value",
+                                valor.isJsonPrimitive() ? valor.getAsString() : valor.toString());
+                    }
+
+                    if (atributo.has("name"))
+                        aspectosLimpios.add(atributo);
+                }
+
+                nuevo.add("localizedAspects", aspectosLimpios);
+
+            } else {
+                JsonArray vacio = new JsonArray();
+                vacio.add("Sin atributos disponibles");
+                nuevo.add("localizedAspects", vacio);
+            }
+
+
+
+            // ==========================
+            // 📌 AGREGAR RESULTADO FINAL
+            // ==========================
             resultados.add(nuevo);
 
         } catch (Exception e) {
@@ -430,4 +600,97 @@ public class conect_API_eBay {
 
         return precios;
     }
+
+    public Double obtenerPrecioActual(String itemId, String token) {
+
+        try {
+            // Endpoint oficial de eBay Browse API
+            String url = "https://api.ebay.com/buy/browse/v1/item/" + itemId;
+
+            HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Authorization", "Bearer " + token);
+            con.setRequestProperty("Content-Type", "application/json");
+
+            int status = con.getResponseCode();
+
+            if (status != 200) {
+                System.err.println("❌ Error eBay (" + status + ") al consultar precio del item: " + itemId);
+                return null;
+            }
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String line;
+
+            while ((line = in.readLine()) != null) {
+                response.append(line);
+            }
+
+            in.close();
+            con.disconnect();
+
+            // Parse JSON
+            JsonObject json = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+            if (json.has("price") && json.get("price").isJsonObject()) {
+                JsonObject priceObj = json.getAsJsonObject("price");
+
+                if (priceObj.has("value")) {
+                    return priceObj.get("value").getAsDouble();
+                }
+            }
+
+            System.err.println("⚠️ El producto no contiene campo de precio en la API.");
+            return null;
+
+        } catch (Exception e) {
+            System.err.println("⚠️ Error obteniendo precio actual desde API: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<JsonObject> buscarProductosSimilares(String query, String token) {
+        List<JsonObject> resultados = new ArrayList<>();
+
+        try {
+            String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
+            String url = "https://api.ebay.com/buy/browse/v1/item_summary/search?q=" + encodedQuery;
+
+            HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Authorization", "Bearer " + token);
+            con.setRequestProperty("Content-Type", "application/json");
+
+            int status = con.getResponseCode();
+            if (status != 200) {
+                System.err.println("❌ Error al buscar productos similares (" + status + ")");
+                return resultados;
+            }
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String line;
+
+            while ((line = in.readLine()) != null) {
+                response.append(line);
+            }
+
+            JsonObject json = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+            if (!json.has("itemSummaries")) {
+                return resultados;
+            }
+
+            json.getAsJsonArray("itemSummaries").forEach(elem -> resultados.add(elem.getAsJsonObject()));
+
+        } catch (Exception e) {
+            System.err.println("⚠️ Error buscando productos similares: " + e.getMessage());
+        }
+
+        return resultados;
+    }
+
+
 }

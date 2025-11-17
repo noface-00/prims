@@ -1,9 +1,12 @@
 package interfaz.controllers;
 
+import dao.WishlistDAO;
 import entities.ImagesProduct;
 import entities.PriceHistory;
 import entities.Producto;
+import entities.WishlistProduct;
 import javafx.animation.ScaleTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,10 +15,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import service.ProductAnalysisService;
+import utils.NotificationManager;
+import utils.Sesion;
 
 import java.awt.*;
 import java.net.URI;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class ProductCardController {
 
@@ -30,8 +37,6 @@ public class ProductCardController {
 
     @FXML
     private ImageView imgProduct;
-    @FXML
-    private Button btn_guardarInfo;
     @FXML
     private Button btn_url;
 
@@ -118,23 +123,6 @@ public class ProductCardController {
             mainController.openProductDetail(producto);
         }
     }
-    private boolean isPressed = true;
-    @FXML
-    private void onSaveInfo() {
-        if(!isPressed) {
-            btn_guardarInfo.setText("Guardar Producto");
-            ProductController productController = new ProductController();
-            productController.loadProduct(producto);
-            productController.guardarProducto();
-            isPressed = true;
-        } else{
-            btn_guardarInfo.setText("Cancelar");
-            ProductAnalysisController productAnalysisController = new ProductAnalysisController();
-//            productAnalysisController.();
-            isPressed = false;
-        }
-    }
-
     @FXML
     private void onClickedURL() {
         try {

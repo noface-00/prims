@@ -19,11 +19,6 @@
             <Font name="Poppins Medium" size="13.0" />
          </font>
       </Label>
-      <Button fx:id="btn_guardarInfo" alignment="CENTER" mnemonicParsing="false" onAction="#onSaveInfo" prefWidth="158.0" style="-fx-background-color: black; -fx-border-color: black; -fx-text-fill: white;" text="Guardar Producto" textAlignment="CENTER">
-         <font>
-            <Font name="Poppins SemiBold" size="13.0" />
-         </font>
-      </Button>
       <Button fx:id="btn_url" alignment="CENTER" mnemonicParsing="false" onAction="#onClickedURL" prefWidth="158.0" style="-fx-background-color: black; -fx-border-color: black; -fx-text-fill: white;" text="Visitar Sitio" textAlignment="CENTER">
          <font>
             <Font name="Poppins SemiBold" size="13.0" />
