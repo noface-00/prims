@@ -19,6 +19,8 @@ META-INF/
 /vcs.xml
 ../lib/
 lib/
+lib/javafx-sdk-25.0.1/
+
 ### Eclipse ###
 .apt_generated
 .classpath
