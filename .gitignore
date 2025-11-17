@@ -19,6 +19,11 @@ META-INF/
 /vcs.xml
 ../lib/
 /lib/
+# Ignorar JavaFX SDK
+javafx-sdk*/
+lib/javafx-sdk*/
+*/javafx-sdk-*/
+*.dylib
 
 ### Eclipse ###
 .apt_generated
