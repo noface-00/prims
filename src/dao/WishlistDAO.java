@@ -4,6 +4,7 @@ import entities.WishlistProduct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
+import utils.Sesion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,5 +106,41 @@ public class WishlistDAO extends genericDAO<WishlistProduct> {
             em.close();
         }
     }
+
+    public WishlistProduct findByItemId(String itemId) {
+        try {
+            EntityManager em = emf.createEntityManager();
+
+            TypedQuery<WishlistProduct> query = em.createQuery(
+                    "SELECT w FROM WishlistProduct w WHERE w.idItem.itemId = :itemId AND w.idUser.id = :userId",
+                    WishlistProduct.class
+            );
+
+            query.setParameter("itemId", itemId);
+            query.setParameter("userId", Sesion.getUsuario().getId());
+
+            return query.getSingleResult();
+
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    public int countByUser(int userId) {
+        try {
+            EntityManager em = emf.createEntityManager();
+            Long count = em.createQuery(
+                            "SELECT COUNT(w) FROM WishlistProduct w WHERE w.idUser.id = :userId",
+                            Long.class
+                    ).setParameter("userId", userId)
+                    .getSingleResult();
+
+            return count.intValue();
+
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
 
 }

@@ -118,14 +118,19 @@ public class ProductCardController {
             mainController.openProductDetail(producto);
         }
     }
-    private boolean isPressed = false;
+    private boolean isPressed = true;
     @FXML
     private void onSaveInfo() {
         if(!isPressed) {
             btn_guardarInfo.setText("Guardar Producto");
+            ProductController productController = new ProductController();
+            productController.loadProduct(producto);
+            productController.guardarProducto();
             isPressed = true;
         } else{
             btn_guardarInfo.setText("Cancelar");
+            ProductAnalysisController productAnalysisController = new ProductAnalysisController();
+            productAnalysisController.onDeletedWish();
             isPressed = false;
         }
     }

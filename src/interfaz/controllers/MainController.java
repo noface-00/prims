@@ -15,8 +15,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import utils.NotificationManager;
 import utils.Sesion;
 
 import java.io.IOException;
@@ -36,8 +38,15 @@ public class MainController {
     @FXML
     private Label lblNumSave;
 
+    @FXML private StackPane rootPane;
     @FXML
     public void initialize() {
+        if (rootPane != null) {
+            NotificationManager.initialize(rootPane);
+            System.out.println("✅ Sistema de notificaciones inicializado en MainController");
+        } else {
+            System.err.println("⚠️ rootContainer es null. Verifica que tu FXML tenga un StackPane como raíz.");
+        }
         if (blockFiltrar != null)
             blockFiltrar.setVisible(false);
         if (blockBuscar != null)
@@ -352,7 +361,10 @@ public class MainController {
     }
 
     @FXML
-    private void onShow() {}
+    private void onShow() {
+        if (lastGallery != null)
+            lastGallery.toggleFilters();
+    }
 
     @FXML
     private void onPanelAnalisis() {
@@ -411,4 +423,8 @@ public class MainController {
         tt.setAutoReverse(true);
         tt.play();
     }
+    public void actualizarWishlistCount(int count) {
+        lblNumSave.setText(String.valueOf(count));
+    }
+
 }

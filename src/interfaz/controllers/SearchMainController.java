@@ -3,6 +3,7 @@ package interfaz.controllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import utils.NotificationManager;
 
 public class SearchMainController {
 
@@ -28,6 +29,7 @@ public class SearchMainController {
     private void onSearch() {
         String palabra = txtSearch.getText().trim();
         if (palabra.isEmpty()) {
+            NotificationManager.info("Ingresa una palabra para la busqueda.");
             System.out.println("⚠️ Debes ingresar una palabra de búsqueda.");
             return;
         }

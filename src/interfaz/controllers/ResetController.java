@@ -11,6 +11,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import utils.HashUtil;
+import utils.NotificationManager;
 
 public class ResetController {
 
@@ -29,20 +30,20 @@ public class ResetController {
         String pass2 = txtContrasenaRep.getText().trim();
 
         if (user.isEmpty()) {
-            alert("Por favor ingrese el usuario o email.");
+            NotificationManager.warning("Ingrese su usuario o email.");
             main.shake(txtUsuario);
             return;
         }
 
         // Validar contraseña mínima
         if (pass.length() < 6) {
-            alert("La contraseña debe tener al menos 6 caracteres.");
+            NotificationManager.warning("La contraseña debe tener al menos 6 caracteres.");
             main.shake(txtContrasena);
             return;
         }
 
         if (!pass.equals(pass2)) {
-            alert("Las contraseñas no coinciden.");
+            NotificationManager.warning("Las contraseñas no coinciden.");
             main.shake(txtContrasenaRep);
             return;
         }
@@ -57,21 +58,14 @@ public class ResetController {
         boolean ok = dao.resetPasswordByUserOrEmail(user, newHash);
 
         if (ok) {
-            alert("Contraseña restablecida exitosamente ✔");
+            NotificationManager.warning("Contraseña restablecida exitosamente.");
         } else {
-            alert("El usuario o email no existe.");
+            NotificationManager.warning("El usuario o email no existe.");
         }
         volverLogin();
     }
 
     private void volverLogin() {
         main.loadPanel("/interfaz/panelLogin.fxml");
-    }
-
-    private void alert(String msg) {
-        Alert a = new Alert(Alert.AlertType.INFORMATION);
-        a.setHeaderText(null);
-        a.setContentText(msg);
-        a.show();
     }
 }

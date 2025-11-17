@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 import utils.HashUtil;
+import utils.NotificationManager;
 
 public class RegisterController {
 
@@ -36,33 +37,34 @@ public class RegisterController {
 
         // Validaciones
         if (user.isEmpty()) {
-            alert("Ingresa un nombre de usuario.");
+            NotificationManager.warning("Ingresa nombre de usuario.");
             main.shake(txtUsuario);
             return;
         }
 
         if (email.isEmpty()) {
-            alert("Ingresa tu correo electrónico.");
+            NotificationManager.warning("Ingresa tu correo electrónico.");
             main.shake(txtEmail);
             return;
         }
 
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-            alert("Correo electrónico no válido.");
+            NotificationManager.warning("Correo electrónico no valido.");
+
             main.shake(txtEmail);
             return;
         }
 
         if (pass.length() < 6) {
             main.shake(txtContrasena);
-            alert("La contraseña debe tener mínimo 6 caracteres.");
+            NotificationManager.warning("La contraseña debe tener mínimo 6 caracteres.");
             return;
         }
 
         if (!pass.equals(pass2)) {
             main.shake(txtContrasena);
             main.shake(txtContrasenaRep);
-            alert("Las contraseñas no coinciden.");
+            NotificationManager.warning("Las contraseñas no coinciden.");
             return;
         }
 
@@ -84,13 +86,11 @@ public class RegisterController {
         dao.create(nuevo);
 
         if (dao.existsUser(user, email)) {
-            alert("El usuario o email ya están registrados.");
+            NotificationManager.warning("El usuario o email ya estan registrados");
             return;
         }
 
-
-        alert("Cuenta creada con éxito 😊");
-
+        NotificationManager.success("Cuenta creada con éxito");
             main.slideOutToRight(panelRegister, () -> {
                 main.loadPanel("/interfaz/panelLogin.fxml");
             });
@@ -101,14 +101,6 @@ public class RegisterController {
         main.changeWithSlide(panelRegister, "/interfaz/panelLogin.fxml");
     }
 
-
-
-    private void alert(String msg) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.show();
-    }
 
 
 }

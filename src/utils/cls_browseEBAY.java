@@ -6,7 +6,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import entities.*;
-import keys.config;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -22,12 +21,27 @@ public class cls_browseEBAY {
     public cls_browseEBAY() {
     }
 
-    public List<Producto> obtenerProductos(String token,String palabra) throws Exception {
+    public List<Producto> obtenerProductos(
+            String token,
+            String palabra,
+            Double precioMin,
+            Double precioMax,
+            String condicion,
+            String ordenar
+    )  throws Exception {
 
 
         List<Producto> listaProductos = new ArrayList<>();
 
-        JsonArray productos = api.browseProducts(token, palabra, 15);
+        JsonArray productos = conect_API_eBay.browseProducts(
+                token,
+                palabra,
+                50,
+                precioMin,
+                precioMax,
+                condicion,
+                ordenar
+        );
 
         if (productos != null) {
             for (JsonElement elem : productos) {

@@ -257,7 +257,7 @@ public class ProductController {
     }
 
     @FXML
-    private void guardarProducto() {
+    protected void guardarProducto() {
         if (producto == null) {
             System.err.println("Producto no puede ser nulo");
             //mostrarAlerta("Advertencia", "No hay producto cargado para guardar.", Alert.AlertType.WARNING);

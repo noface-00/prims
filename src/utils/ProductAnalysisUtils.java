@@ -36,7 +36,7 @@ public class ProductAnalysisUtils {
      */
     public static JsonObject analizarMercado(String token, String keyword, int limit) throws Exception {
         conect_API_eBay api = new conect_API_eBay();
-        JsonArray productos = api.browseProducts(token, keyword, limit);
+        JsonArray productos = api.browseProducts(token, keyword, limit,null,null,null,null);
 
         if (productos == null || productos.size() == 0) {
             System.out.println("⚠️ No se encontraron productos similares para: " + keyword);

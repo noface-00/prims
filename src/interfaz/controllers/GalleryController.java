@@ -12,6 +12,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import utils.NotificationManager;
 import utils.Sesion;
 import utils.TokenManager;
 import utils.cls_browseEBAY;
@@ -50,7 +51,7 @@ public class GalleryController {
 
     private final List<Producto> allProducts = new ArrayList<>();
     private int currentPage = 1;
-
+    private cls_browseEBAY apiLoader = new cls_browseEBAY();
     private static final int COLUMNS = 5;
     private static final int ROWS = 3;
     private static final int ITEMS_PER_PAGE = COLUMNS * ROWS;
@@ -64,8 +65,13 @@ public class GalleryController {
     }
 
     public void setSearchTerm(String term) {
-        this.searchTerm = term;
-        loadProducts(term);
+        if(term != null) {
+            this.searchTerm = term;
+            loadProducts(term);
+        }else {
+            NotificationManager.info("Ingresa una palabra para la busqueda.");
+        }
+
     }
 
     @FXML
@@ -76,8 +82,8 @@ public class GalleryController {
     public void loadProducts(String palabra) {
         try {
             System.out.println("🌐 Cargando productos desde la API eBay...");
-            cls_browseEBAY apiLoader = new cls_browseEBAY();
-            List<Producto> productos = apiLoader.obtenerProductos(token, palabra);
+
+            List<Producto> productos = apiLoader.obtenerProductos(token, palabra,null,null,null, null);
 
             if (productos.isEmpty()) {
                 gridPane.getChildren().clear();
@@ -197,8 +203,8 @@ public class GalleryController {
 
 
 
-    @FXML
-    private void nextPage() {
+
+    @FXML private void nextPage() {
         int totalPages = (int) Math.ceil((double) allProducts.size() / ITEMS_PER_PAGE);
         if (currentPage < totalPages) {
             currentPage++;
@@ -207,8 +213,7 @@ public class GalleryController {
         }
     }
 
-    @FXML
-    private void previousPage() {
+    @FXML private void previousPage() {
         if (currentPage > 1) {
             currentPage--;
             renderPage();
@@ -216,68 +221,54 @@ public class GalleryController {
         }
     }
 
+    /** 🔹 Mostrar/Ocultar filtros */
     public void toggleFilters() {
-        boolean isVisible = filterPanel.isVisible();
-        filterPanel.setVisible(!isVisible);
-        filterPanel.setManaged(!isVisible);
+        boolean v = filterPanel.isVisible();
+        filterPanel.setVisible(!v);
+        filterPanel.setManaged(!v);
     }
 
     /** ============================================================
-     FILTRO POR BOTÓN
+     APLICAR FILTRO
      ============================================================ */
 
     @FXML
     private void applyFiltersButton() {
-//        System.out.println("🎯 Aplicando filtros manualmente...");
-//
-//        filteredProducts = allProducts.stream()
-//                .filter(this::filterByPrice)
-//                .filter(this::filterByCondition)
-//                .collect(Collectors.toList());
-//
-//        applySorting();
-//
-//        currentPage = 1;
-//        renderPage();
-//        updatePaginationButtons();
-    }
+        try {
 
-//    private boolean filterByPrice(Producto p) {
-//        try {
-//            double min = txtPrecioMin.getText().isEmpty() ? 0 : Double.parseDouble(txtPrecioMin.getText());
-//            double max = txtPrecioMax.getText().isEmpty() ? Double.MAX_VALUE : Double.parseDouble(txtPrecioMax.getText());
-//
-//            return p.getCurrentPrice() >= min && p.getCurrentPrice() <= max;
-//        } catch (Exception e) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean filterByCondition(Producto p) {
-//        boolean nuevo = cbNuevo.isSelected();
-//        boolean usado = cbUsado.isSelected();
-//
-//        if (!nuevo && !usado) return true; // sin filtro
-//
-//        String cond = p.getCondition().toLowerCase();
-//
-//        if (nuevo && cond.contains("new")) return true;
-//        if (usado && cond.contains("used")) return true;
-//
-//        return false;
-//    }
-//
-//    private void applySorting() {
-//        if (cbMenorPrecio.isSelected())
-//            filteredProducts.sort(Comparator.comparing(Producto::getCurrentPrice));
-//
-//        if (cbMayorPrecio.isSelected())
-//            filteredProducts.sort(Comparator.comparing(Producto::getCurrentPrice).reversed());
-//
-//        if (cbMasRecientes.isSelected())
-//            filteredProducts.sort(Comparator.comparing(Producto::getStartTime).reversed());
-//
-//        if (cbRecomendado.isSelected())
-//            filteredProducts.sort(Comparator.comparing(Producto::getTotalScore).reversed());
-//    }
+            // 🔸 FILTROS
+            Double min = txtPrecioMin.getText().isEmpty() ? null : Double.parseDouble(txtPrecioMin.getText());
+            Double max = txtPrecioMax.getText().isEmpty() ? null : Double.parseDouble(txtPrecioMax.getText());
+
+            String condition = null;
+            if (cbNuevo.isSelected()) condition = "new";
+            if (cbUsado.isSelected()) condition = "used";
+
+            String sort = null;
+            if (cbMenorPrecio.isSelected()) sort = "asc";
+            if (cbMayorPrecio.isSelected()) sort = "desc";
+            if (cbMasRecientes.isSelected()) sort = "recent";
+
+            System.out.println("🔎 Buscando con filtros → " + searchTerm);
+
+            List<Producto> filtrados = apiLoader.obtenerProductos(
+                    token,
+                    searchTerm,
+                    min,
+                    max,
+                    condition,
+                    sort
+            );
+
+            allProducts.clear();
+            allProducts.addAll(filtrados);
+
+            currentPage = 1;
+            renderPage();
+            updatePaginationButtons();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

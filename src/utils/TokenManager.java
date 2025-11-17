@@ -2,7 +2,6 @@ package utils;
 
 import api.conect_API_eBay;
 import keys.config;
-
 public class TokenManager {
 
     private static final String CLIENT_ID = config.getProperty("CLIENT_ID");

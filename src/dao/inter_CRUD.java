@@ -1,9 +1,10 @@
 package dao;
 
 public interface inter_CRUD<T> {
-    public void create(T entitty);
+    void create(T entity);
     T read(Object id);
-    public void update(T entitty);
-    public void delete(Object id);
-
+    void update(T entity);
+    void delete(T entity);
 }
+
+

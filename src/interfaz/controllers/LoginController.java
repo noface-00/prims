@@ -11,6 +11,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 import utils.HashUtil;
+import utils.NotificationManager;
 import utils.Sesion;
 import utils.TokenManager;
 
@@ -38,13 +39,13 @@ public class LoginController {
         String hash = HashUtil.sha256(pass);
 
         if (user.isEmpty()) {
-            mostrarAlerta("Por favor ingresa el usuario.");
+            NotificationManager.warning("Ingresa el usuario.");
             main.shake(txtUsuario);
             return;
         }
 
         if (pass.isEmpty()) {
-            mostrarAlerta("Por favor ingresa la contraseña.");
+            NotificationManager.warning("Ingresa el contraseña.");
             main.shake(txtContrasena);
             return;
         }
@@ -58,6 +59,7 @@ public class LoginController {
             Sesion.iniciar(auth);
 
             // ✔ Renovar token si caducó (o generar uno si aplica)
+            NotificationManager.success("Inicio exitoso.");
             TokenManager.refreshToken();
             playFadeOut(() -> {
                 main.loadPanel("/interfaz/panel_search_main.fxml");
@@ -66,7 +68,7 @@ public class LoginController {
         } else {
             main.shake(txtUsuario);
             main.shake(txtContrasena);
-            mostrarAlerta("Usuario o contraseña incorrectos.");
+            NotificationManager.warning("Credenciales no validas.");
         }
     }
 
@@ -91,14 +93,6 @@ public class LoginController {
 
         AuthDAO dao = new AuthDAO();
         return dao.login(username, passwordHash); // devuelve el usuario real o null
-    }
-
-
-    private void mostrarAlerta(String msg) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.show();
     }
 
     private void playFadeOut(Runnable after) {

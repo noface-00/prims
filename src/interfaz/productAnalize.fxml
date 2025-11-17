@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.chart.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
 
-<VBox prefHeight="620.0" prefWidth="600.0" spacing="10" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="interfaz.controllers.ProductAnalysisController">
+<VBox prefHeight="620.0" prefWidth="600.0" spacing="10" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="interfaz.controllers.ProductAnalysisController">
     <BorderPane fx:id="togleAnalys" onMouseClicked="#onClicked" prefHeight="200.0" prefWidth="200.0">
         <left>
             <ImageView fx:id="productImage" fitHeight="150.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
@@ -35,8 +41,19 @@
         <right>
 
             <VBox alignment="CENTER" spacing="30" BorderPane.alignment="CENTER">
-                <Button mnemonicParsing="false" prefHeight="33" prefWidth="200" style="-fx-background-color:black; -fx-text-fill:white;" text="Quitar de favoritos" />
-                <Button mnemonicParsing="false" prefHeight="33" prefWidth="200" style="-fx-background-color:black; -fx-text-fill:white;" text="Visitar Producto" />
+                <Button fx:id="btndelWishlist" mnemonicParsing="false" onAction="#onDeletedWish" prefHeight="33" prefWidth="200" style="-fx-background-color:black; -fx-text-fill:white;" text="Quitar de favoritos">
+               <font>
+                  <Font name="Poppins SemiBold" size="13.0" />
+               </font></Button>
+                <Button fx:id="btnProduct" mnemonicParsing="false" onAction="#visitURL" prefHeight="33" prefWidth="200" style="-fx-background-color:black; -fx-text-fill:white;" text="Visitar Producto">
+               <font>
+                  <Font name="Poppins SemiBold" size="13.0" />
+               </font></Button>
+            <Button fx:id="btnReport" mnemonicParsing="false" onAction="#onReportGenerated" prefHeight="33" prefWidth="200" style="-fx-background-color:black; -fx-text-fill:white;" text="Generar Reporte">
+               <font>
+                  <Font name="Poppins SemiBold" size="13.0" />
+               </font>
+            </Button>
                 <padding>
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                 </padding>
@@ -64,6 +81,12 @@
                     <Text fx:id="txtFeedbackScore" style="-fx-font-family: Poppins; -fx-fill: black; -fx-font-size: 13;" text="Feedback puntuacion: 0\n" />
                     <Text fx:id="txtAntiguedad" style="-fx-font-family: Poppins; -fx-fill: black; -fx-font-size: 13;" text="Antigüedad: --\n" />
                     <Text fx:id="txtTrustScore" style="-fx-font-family:Poppins SemiBold; -fx-fill:#1F8A70; -fx-font-size:13;" text="TrustScore: 0 / 100\n" />
+                    <Text fx:id="txtTotalProductos"/>
+                    <Text fx:id="txtPromedioVariacionGeneral"/>
+                    <Text fx:id="txtTopVariacionesPositivas"/>
+                    <Text fx:id="txtTopVariacionesNegativas"/>
+                    <Text fx:id="txtResumenConsultasDiarias"/>
+
                 </TextFlow>
             </VBox>
 

@@ -6,7 +6,6 @@
 /dataSources/
 /dataSources.local.xml
 /libraries
-/src/keys/
 /out/production/
 /META-INF/
 META-INF/
@@ -30,7 +29,7 @@ META-INF/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-
+/src/keys/
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
