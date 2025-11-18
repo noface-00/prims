@@ -26,7 +26,7 @@ public class AtributtesProductDAO extends genericDAO<AtributtesProduct> {
             return count > 0;
 
         } catch (Exception e) {
-            System.err.println("⚠️ Error verificando atributo: " + e.getMessage());
+            System.err.println("Error verificando atributo: " + e.getMessage());
             return false;
 
         } finally {

@@ -329,8 +329,10 @@ public class ProductAnalysisController {
     }
 
     @FXML
-    private void onClicked() {
-        content.setVisible(!content.isVisible());
+    public void onClicked() {
+        boolean isVisible = content.isVisible();
+        content.setVisible(!isVisible);
+        content.setManaged(!isVisible); // Agregar esta línea
     }
 
     @FXML

@@ -6,16 +6,16 @@
   <component name="ChangeListManager">
     <list default="true" id="349523fc-2739-4d11-9201-e3b6f677ff46" name="Changes" comment="Update .gitignore">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/api/conect_API_eBay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/conect_API_eBay.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/interfaz/controllers/GalleryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/interfaz/controllers/GalleryController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/interfaz/controllers/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/interfaz/controllers/MainController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PRIMS_ORM.iml" beforeDir="false" afterPath="$PROJECT_DIR$/PRIMS_ORM.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dao/AtributtesProductDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/dao/AtributtesProductDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dao/CouponProDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/dao/CouponProDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dao/ImagesProductDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/dao/ImagesProductDAO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/interfaz/controllers/ProductAnalysisController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/interfaz/controllers/ProductAnalysisController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/interfaz/controllers/ProductCardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/interfaz/controllers/ProductCardController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/interfaz/controllers/ProductController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/interfaz/controllers/ProductController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/interfaz/panel_search.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/interfaz/panel_search.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/interfaz/panel_search_main.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/interfaz/panel_search_main.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/interfaz/panel_wishlist.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/interfaz/panel_wishlist.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/interfaz/productAnalize.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/interfaz/productAnalize.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/interfaz/product_card.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/interfaz/product_card.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/NotificationManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/NotificationManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/ReportService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/ReportService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,41 +68,41 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
-    &quot;Application.App.executor&quot;: &quot;Run&quot;,
-    &quot;Application.MainTest.executor&quot;: &quot;Run&quot;,
-    &quot;Application.main.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/km/IdeaProjects/PRIMS_ORM/src/interfaz/controllers&quot;,
-    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Problems&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "Application.App.executor": "Run",
+    "Application.MainTest.executor": "Run",
+    "Application.main.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/km/IdeaProjects/PRIMS_ORM/src/interfaz/controllers",
+    "list.type.of.created.stylesheet": "CSS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Global Libraries",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="interfaz.controllers" />
@@ -122,7 +122,7 @@
     <configuration name="App" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="interfaz.test.App" />
       <module name="PRIMS_ORM" />
-      <option name="VM_PARAMETERS" value="--module-path &quot;$USER_HOME$/downloads/javafx-sdk-25.0.1 2/lib&quot; --add-modules javafx.controls,javafx.fxml --enable-native-access=javafx.graphics -Djava.util.logging.config.file=src/recursos/logging.properties -Dorg.jboss.logging.provider=slf4j -Dorg.slf4j.simpleLogger.defaultLogLevel=error" />
+      <option name="VM_PARAMETERS" value="--module-path &quot;$PROJECT_DIR$/SDK&quot; --add-modules javafx.controls,javafx.fxml --enable-native-access=javafx.graphics -Djava.util.logging.config.file=src/recursos/logging.properties -Dorg.jboss.logging.provider=slf4j -Dorg.slf4j.simpleLogger.defaultLogLevel=error" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="interfaz.test.*" />

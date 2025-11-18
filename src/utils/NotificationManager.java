@@ -78,8 +78,8 @@ public class NotificationManager {
             notificationContainer.setMaxHeight(Region.USE_PREF_SIZE);
 
             // Posicionar en la esquina superior derecha
-            StackPane.setAlignment(notificationContainer, Pos.TOP_RIGHT);
-            StackPane.setMargin(notificationContainer, new Insets(20, 20, 0, 0));
+            StackPane.setAlignment(notificationContainer, Pos.TOP_CENTER);
+            StackPane.setMargin(notificationContainer, new Insets(0));
             notificationContainer.setPickOnBounds(false);
             mainContainer.getChildren().add(notificationContainer);
 
@@ -170,15 +170,15 @@ public class NotificationManager {
 
         // Animación de entrada
         notificationBox.setOpacity(0);
-        notificationBox.setTranslateX(50);
+        notificationBox.setTranslateY(-80);
 
         FadeTransition fadeIn = new FadeTransition(Duration.millis(300), notificationBox);
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);
 
         TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), notificationBox);
-        slideIn.setFromX(50);
-        slideIn.setToX(0);
+        slideIn.setFromY(-80);
+        slideIn.setToY(0);
 
         ParallelTransition entrance = new ParallelTransition(fadeIn, slideIn);
 
@@ -191,8 +191,8 @@ public class NotificationManager {
         fadeOut.setToValue(0);
 
         TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), notificationBox);
-        slideOut.setFromX(0);
-        slideOut.setToX(50);
+        slideOut.setFromY(0);
+        slideOut.setToY(-80);
 
         ParallelTransition exit = new ParallelTransition(fadeOut, slideOut);
         exit.setOnFinished(e -> {
@@ -210,8 +210,8 @@ public class NotificationManager {
      */
     private static void hideNotification(Node notification) {
         FadeTransition fadeOut = new FadeTransition(Duration.millis(200), notification);
-        fadeOut.setFromValue(1);
-        fadeOut.setToValue(0);
+        fadeOut.setFromValue(0);
+        fadeOut.setToValue(1);
         fadeOut.setOnFinished(e -> {
             notificationContainer.getChildren().remove(notification);
             processQueue();
@@ -301,8 +301,8 @@ public class NotificationManager {
             fadeIn.setToValue(1);
 
             TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), progressNotification);
-            slideIn.setFromX(50);
-            slideIn.setToX(0);
+            slideIn.setFromY(50);
+            slideIn.setToY(0);
 
             new ParallelTransition(fadeIn, slideIn).play();
         });

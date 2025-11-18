@@ -62,7 +62,7 @@ public class CouponProDAO extends genericDAO<CouponPro> {
                     .getSingleResult();
 
         } catch (NoResultException e) {
-            System.out.println("⚠️ No se encontró cupón para itemId: " + itemId);
+            System.out.println("No se encontró cupón para itemId: " + itemId);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

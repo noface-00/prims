@@ -29,7 +29,7 @@ public class ReportService {
      */
     public static void generarReporteUnico(Producto producto, ProductAnalysis analysis) {
         if (producto == null || analysis == null) {
-            System.err.println("❌ Producto o análisis nulo, no se puede generar reporte");
+            System.err.println("Producto o análisis nulo, no se puede generar reporte");
             return;
         }
 
@@ -165,8 +165,7 @@ public class ReportService {
             document.save(outputFile);
             document.close();
 
-            System.out.println("✅ Reporte PDF generado exitosamente: " + downloadsPath);
-            NotificationManager.success("📄 Reporte guardado en Descargas: " + fileName);
+            System.out.println("Reporte PDF generado exitosamente: " + downloadsPath);
 
         } catch (IOException e) {
             System.err.println("❌ Error generando reporte PDF: " + e.getMessage());

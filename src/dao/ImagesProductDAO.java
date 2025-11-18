@@ -42,7 +42,7 @@ public class ImagesProductDAO extends genericDAO<ImagesProductDAO> {
                     .setMaxResults(1)
                     .getSingleResult();
         } catch (NoResultException e) {
-            System.out.println("⚠️ No se encontró imagen para el producto " + producto.getItemId());
+            System.out.println("No se encontró imagen para el producto " + producto.getItemId());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
