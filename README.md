@@ -194,9 +194,9 @@ Si encuentras problemas durante la instalación:
 
 ## Autores
 
-- [Nombre del autor/equipo]
-- [Información de contacto]
+- [Kevin Mora]
+- [kevin.mora@est.ucacue.edu.ec]
 
 ---
 
-**Última actualización:** [Fecha]
+**Última actualización:** [18 de noviembre del 2025]
